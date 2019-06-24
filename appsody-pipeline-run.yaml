@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  name: appsody-manual-pipeline-run
+spec:
+  serviceAccount: appsody-sa
+  timeout: "1h0m0s"  
+  pipelineRef:
+    name: appsody-build-pipeline
+  trigger:
+    type: manual
+  resources:
+    - name: appsody-source
+      resourceRef:
+        name: appsody-source
+    - name: docker-image
+      resourceRef:
+        name: docker-image
