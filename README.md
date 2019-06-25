@@ -5,11 +5,11 @@ Example implementation of a Tekton pipeline that deploys an Appsody project.
 This repo contains an example of a Tekton pipeline that builds and deploys an application created with [Appsody](https://github.com/appsody/appsody) to a Kubernetes cluster. The application is deployed as a Knative Serving service. 
 
 ## Prerequisites and assumptions
-This example can be put to fruition once you have fulfilled the following prerequisites:
+In order to run this example, the following prerequisites are required:
 1) You have access to a Kubernetes cluster where Knative and its prerequisites are configured. You can read about setting up Knative [here](https://knative.dev/docs/install/).
 2) Your Kubernetes cluster has the [Tekton pipelines installed](https://github.com/tektoncd/pipeline/blob/master/docs/install.md).
-3) You have created an application using the appsody CLI, and have checked in your code in a GitHub repository.
-4) Your code repository includes a Knative Serving manifest file called `appsody-service.yaml`. We'll discuss this aspect more in detail later on.
+3) You have created an application using the appsody CLI, and your code is in a GitHub repository.
+4) Your code repository includes a Knative Serving manifest file called `appsody-service.yaml`. We'll discuss this aspect in more detail later on.
 5) Your Kubernetes cluster can access Docker Hub (it can pull and push images).
 
 ## Setting up the pipeline
@@ -23,13 +23,13 @@ kubectl apply -f appsody-service-account.yaml
 kubectl apply -f appsody-cluster-role-binding.yaml
 ```
 
-2) Now, create the pipeline task and the pipeline definition. We have here a simple pipeline, with just a single task that performs the various steps of building and deploying the project:
+2) Now, create the pipeline task and the pipeline definition. We have  a simple pipeline, with a single task that performs the various steps of building and deploying the project:
 ```
 kubectl apply -f appsody-build-task.yaml
 kubectl apply -f appsody-build-pipeline.yaml
 ```
 3) The pipeline requires the definition of two resources in order to operate:
-* The definition docker image that is built and deployed by the pipeline itself
+* The definition of the Docker image that is built and deployed by the pipeline itself
 * The location of the GitHub project that contains your code
 
 For this reason, you need to edit the `appsody-pipeline-resource.yaml`. Change the value of the Docker image url to match your settings:
