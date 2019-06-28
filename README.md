@@ -10,7 +10,7 @@ In order to run this example, the following prerequisites are required:
 2) Your Kubernetes cluster has the [Tekton pipelines installed](https://github.com/tektoncd/pipeline/blob/master/docs/install.md).
 3) You have created an application using the appsody CLI, and your code is in a GitHub repository.
 4) Your code repository includes a Knative Serving manifest file called `appsody-service.yaml`. We'll discuss this aspect in more detail later on.
-5) Your Kubernetes cluster can access Docker Hub (it can pull and push images).
+5) Your Kubernetes cluster can access a Docker registry, such as Docker Hub (it can pull and push images). You must have a secret set up that contains valid credentials for authentication against your Docker registry.
 
 ## Setting up the pipeline
 This repo contains the manifests for the resources that you need to create on your cluster in order to run the Tekton pipeline for Appsody.
@@ -22,8 +22,22 @@ For this reason, create a service account and the appropriate cluster role bindi
 kubectl apply -f appsody-service-account.yaml
 kubectl apply -f appsody-cluster-role-binding.yaml
 ```
+The previous commands set up a service account called `appsody-sa` and grant the `cluster-admin` role to it. The pipeline you are going to create uses this service account. 
 
-2) Now, create the pipeline task and the pipeline definition. We have  a simple pipeline, with a single task that performs the various steps of building and deploying the project:
+2) Make the Docker registry credentials available to the pipeline by adding your docker secret to the `appsody-sa` service account. This can be accomplished by editing the service account, using the following command:
+```
+kubectl edit serviceaccount appsody-sa
+```
+An editor opens up. Add your secret to the list of secrets, as shown in the example below: 
+```
+...
+secrets:
+- name: appsody-sa-token-ldzbq
+- name: my-docker-secret
+```
+Save the changes. 
+
+2) Now, create the pipeline task and the pipeline definition. We have a simple pipeline, with a single task that performs the various steps of building and deploying the project:
 ```
 kubectl apply -f appsody-build-task.yaml
 kubectl apply -f appsody-build-pipeline.yaml
@@ -76,7 +90,7 @@ spec:
             image: mydockeraccount/appsody-project
             imagePullPolicy: Always
             ports:
-            - containerPort: 9229
+            - containerPort: 3000
 
 ```
 The file can be located anywhere within your project, since the pipeline will discover it. 
