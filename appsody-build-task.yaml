@@ -19,7 +19,7 @@ spec:
         type: image
   steps:
     - name: assemble-extract-step
-      image: chilantim/appsody-docker
+      image: appsody/appsody-docker
       command: ["/bin/bash"]
       args:
         - -c
