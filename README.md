@@ -30,7 +30,7 @@ kubectl apply -f appsody-build-pipeline.yaml
 ```
 If you are targeting **Openshift**, you need to edit the `appsody-build-task`, and set the path to the Docker config file for the Kaniko container. Issue the following command:
 ```
-
+kubectl edit task appsody-build-task
 ```
 and then add this environment variable to the `build-push-step` step:
 ```   
