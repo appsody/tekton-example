@@ -46,7 +46,7 @@ kubectl apply -f appsody-build-pipeline.yaml
 * The definition of the Docker image that is built and deployed by the pipeline itself
 * The location of the GitHub project that contains your code
 
-For this reason, you need to edit the `appsody-pipeline-resource.yaml`. Change the value of the Docker image url to match your settings:
+For this reason, you need to edit the `appsody-pipeline-resources.yaml`. Change the value of the Docker image url to match your settings:
 ```
 ...
   spec:
