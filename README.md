@@ -37,7 +37,7 @@ secrets:
 ```
 Save the changes. 
 
-2) Now, create the pipeline task and the pipeline definition. We have a simple pipeline, with a single task that performs the various steps of building and deploying the project:
+3) Now, create the pipeline task and the pipeline definition. We have a simple pipeline, with a single task that performs the various steps of building and deploying the project:
 ```
 kubectl apply -f appsody-build-task.yaml
 kubectl apply -f appsody-build-pipeline.yaml
@@ -63,7 +63,8 @@ The complete set of environment variables for that step should look like the fol
       value: ${inputs.params.appsody-deploy-file-name}
 ```
 Note - this addition for Openshift is required for reasons explained in [this issue](https://github.com/appsody/tekton-example/issues/6).
-3) The pipeline requires the definition of two resources in order to operate:
+
+4) The pipeline requires the definition of two resources in order to operate:
 * The definition of the Docker image that is built and deployed by the pipeline itself
 * The location of the GitHub project that contains your code
 
