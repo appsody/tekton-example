@@ -52,15 +52,19 @@ This repo contains the manifests for the resources that you need to create on yo
         - name: DOCKER_CONFIG
           value: /builder/home/.docker
     ``` 
-    The complete set of environment variables for that step should look like the following:
+    The complete definition of the `build-push-step` should be as follows:
     ```
-        env:
-        - name: DOCKER_CONFIG
-          value: /builder/home/.docker
-        - name: IMG
-          value: ${outputs.resources.docker-image.url}
-        - name: YAMLFILE
-          value: ${inputs.params.appsody-deploy-file-name}
+    - name: build-push-step
+      image: gcr.io/kaniko-project/executor
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=${inputs.params.pathToDockerFile}
+        - --destination=${outputs.resources.docker-image.url}
+        - --context=${inputs.params.pathToContext}
+      env:
+      - name: DOCKER_CONFIG
+        value: /builder/home/.docker
     ```
     Note - this addition for Openshift is required for reasons explained in [this issue](https://github.com/appsody/tekton-example/issues/6).
 
