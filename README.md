@@ -12,6 +12,8 @@ In order to run this example, the following prerequisites are required:
 1) Your code repository includes a Knative Serving manifest file called `appsody-service.yaml`. We'll discuss this aspect in more detail later on.
 1) Your Kubernetes cluster can access a Docker registry, such as Docker Hub (it can pull and push images). You must have a secret set up that contains valid credentials for authentication against your Docker registry.
 
+This example and the artifacts that are included assume that you will be deploying the pipeline in the `default` namespace. If you wish to deploy it in your own namespace, you need to make the necessary changes (either append `-n <namespace>` to the `kubectl apply` commands, or edit the manifests to include a `namespace` definition).
+
 ## Setting up the pipeline
 This repo contains the manifests for the resources that you need to create on your cluster in order to run the Tekton pipeline for Appsody.
 
@@ -42,31 +44,7 @@ This repo contains the manifests for the resources that you need to create on yo
     kubectl apply -f appsody-build-task.yaml
     kubectl apply -f appsody-build-pipeline.yaml
     ```
-    If you are targeting **Openshift**, you need to edit the `appsody-build-task`, and set the path to the Docker config file for the Kaniko container. Issue the following command:
-    ```
-    kubectl edit task appsody-build-task
-    ```
-    and then add this environment variable to the `build-push-step` step:
-    ```   
-        env:
-        - name: DOCKER_CONFIG
-          value: /builder/home/.docker
-    ``` 
-    The complete definition of the `build-push-step` should be as follows:
-    ```
-    - name: build-push-step
-      image: gcr.io/kaniko-project/executor
-      command:
-        - /kaniko/executor
-      args:
-        - --dockerfile=${inputs.params.pathToDockerFile}
-        - --destination=${outputs.resources.docker-image.url}
-        - --context=${inputs.params.pathToContext}
-      env:
-      - name: DOCKER_CONFIG
-        value: /builder/home/.docker
-    ```
-    Note - this addition for Openshift is required for reasons explained in [this issue](https://github.com/appsody/tekton-example/issues/6).
+
 
 1) The pipeline requires the definition of two resources in order to operate:
     * The definition of the Docker image that is built and deployed by the pipeline itself
@@ -96,7 +74,47 @@ This repo contains the manifests for the resources that you need to create on yo
   kubectl apply -f appsody-pipeline-resources.yaml
   ```
   The Tekton pipeline is now fully set up.
+### Openshift considerations
+If you are targeting **Openshift**, ensure you perform the following tasks.
+    
+  #### Make the Docker secret available to Kaniko
+Edit the `appsody-build-task`, and set the path to the Docker config file for the Kaniko container. Issue the following command:
+```
+kubectl edit task appsody-build-task
+```
+and then add this environment variable to the `build-push-step` step:
+```   
+  env:
+   - name: DOCKER_CONFIG
+     value: /builder/home/.docker
+``` 
+The complete definition of the `build-push-step` should be as follows:
+```
+- name: build-push-step
+    image: gcr.io/kaniko-project/executor
+    command:
+      - /kaniko/executor
+    args:
+      - --dockerfile=${inputs.params.pathToDockerFile}
+      - --destination=${outputs.resources.docker-image.url}
+      - --context=${inputs.params.pathToContext}
+    env:
+      - name: DOCKER_CONFIG
+        value: /builder/home/.docker
+```
+  Note - this addition for Openshift is required for reasons explained in [this issue](https://github.com/appsody/tekton-example/issues/6).
 
+  #### Allow Appsody to mount `docker.sock`
+  After you create the `appsody-sa` service account, run the following command:
+  ```
+  oc adm policy add-scc-to-user hostmount-anyuid -z appsody-sa
+  ```
+
+  #### Create a persistent volume
+  You need to create a persistent volume (PV), so that the pipeline can obtain a persistent volume claim when it runs. We have included an example of creating a PV in the `okd-pv.yaml` manifest. You can create it by running:
+  ```
+  kubectl apply -f okd-pv.yaml
+  ```
 ## A few words on the required deployment manifest
 As we mentioned earlier, the pipeline is designed to deploy your application to the Kubernetes cluster as a Knative Serving service. The pipeline expects a deployment manifest located within your project - specifically, it expects to run `kubectl apply` against a file named `appsody-service.yaml`. 
 
