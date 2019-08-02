@@ -5,7 +5,7 @@ metadata:
 spec:
   inputs:
     resources:
-      - name: appsody-source
+      - name: git-source
         type: git
     params:
       - name: pathToDockerFile
@@ -38,7 +38,7 @@ spec:
     - name: modify-yaml
       image: ubuntu
       command: ['/bin/bash']
-      args: ['-c', 'find /workspace/appsody-source -name ${YAMLFILE} -type f -exec sed -i -e s!"image: .*$"!"image: ${IMG}"!g {} \;']
+      args: ['-c', 'find /workspace/git-source -name ${YAMLFILE} -type f -exec sed -i -e s!"image: .*$"!"image: ${IMG}"!g {} \;']
       env:
         - name: IMG
           value: ${outputs.resources.docker-image.url}
@@ -47,7 +47,7 @@ spec:
     - name: install-knative
       image: lachlanevenson/k8s-kubectl
       command: ['/bin/sh']
-      args: ['-c', 'find /workspace/appsody-source -name ${YAMLFILE} -type f|xargs kubectl apply -f']
+      args: ['-c', 'find /workspace/git-source -name ${YAMLFILE} -type f|xargs kubectl apply -f']
       env:
         - name: YAMLFILE
           value: ${inputs.params.appsody-deploy-file-name}
