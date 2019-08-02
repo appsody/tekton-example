@@ -10,9 +10,9 @@ spec:
   trigger:
     type: manual
   resources:
-    - name: appsody-source
+    - name: git-source
       resourceRef:
-        name: appsody-source
+        name: git-source
     - name: docker-image
       resourceRef:
         name: docker-image
