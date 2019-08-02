@@ -24,6 +24,9 @@ spec:
       args:
         - -c
         - "/setupAndRunExtract.sh"
+      env:
+        - name: gitsource
+          value: git-source
       volumeMounts:
         - name: docker-socket
           mountPath: /var/run/docker.sock
