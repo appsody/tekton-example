@@ -116,9 +116,9 @@ The complete definition of the `build-push-step` should be as follows:
   kubectl apply -f okd-pv.yaml
   ```
 ## A few words on the required deployment manifest
-As we mentioned earlier, the pipeline is designed to deploy your application to the Kubernetes cluster as a Knative Serving service. The pipeline expects a deployment manifest located within your project - specifically, it expects to run `kubectl apply` against a file named `appsody-service.yaml`. 
+As we mentioned earlier, the pipeline is designed to deploy your application to the Kubernetes cluster using a provided deployment manifest. The pipeline expects a deployment manifest located within your project - specifically, it expects to run `kubectl apply` against a file named `app-deploy.yaml`. 
 
-Here we provide an example of such a deployment manifest:
+Here we provide an example of such a deployment manifest (this is a Knative example, but the pipeline can support other types of manifests):
 ```
 piVersion: serving.knative.dev/v1alpha1
 kind: Service
@@ -140,15 +140,15 @@ The file can be located anywhere within your project, since the pipeline will di
 
 Notice that the image url must match the definition of the Docker image resource that you created for the pipeline. The `containerPort` must be set to the port number on which the server inside the Appsody stack is configured to listen.
 
-One way to obtain a manifest file that has all the matching settings is to run the `appsody deploy` command, as described in [the Appsody documentation](https://appsody.dev/docs).
+One way to obtain a manifest file that has all the matching settings is to run the `appsody deploy --generate-only` command, as described in [the Appsody documentation](https://appsody.dev/docs).
 
-It must be noted, however, that the pipeline can work with any deployment manifest - not limited to Knative Serving services. Its current implementation applies whatever deployment manifest is contained in `appsody-service.yaml`. 
+As we mentioned, however, the pipeline can work with any deployment manifest - not limited to Knative Serving services. Its current implementation applies whatever deployment manifest is contained in `app-deploy.yaml`. 
 
 The file name can be modified by simply changing the relevant line in `appsody-build-pipeline.yaml`, as pointed out here:
 ```
       params:
       - name: appsody-deploy-file-name
-        value: appsody-service.yaml
+        value: app-deploy.yaml
 ```
 Also, if you wanted to retrieve a deployment manifest from a different repository, rather than assuming its presence in the application code repository, you could modify this section of `appsody-build-task.yaml`:
 ```

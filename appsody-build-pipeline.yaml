@@ -21,4 +21,4 @@ spec:
           resource: docker-image
       params:
       - name: appsody-deploy-file-name
-        value: appsody-service.yaml
+        value: app-deploy.yaml
