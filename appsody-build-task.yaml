@@ -47,7 +47,7 @@ spec:
           value: ${outputs.resources.docker-image.url}
         - name: YAMLFILE
           value: ${inputs.params.appsody-deploy-file-name}
-    - name: install-knative
+    - name: install-manifest
       image: lachlanevenson/k8s-kubectl
       command: ['/bin/sh']
       args: ['-c', 'find /workspace/git-source -name ${YAMLFILE} -type f|xargs kubectl apply -f']
