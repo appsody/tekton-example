@@ -7,8 +7,6 @@ spec:
   timeout: "1h0m0s"  
   pipelineRef:
     name: appsody-build-pipeline
-  trigger:
-    type: manual
   resources:
     - name: git-source
       resourceRef:
