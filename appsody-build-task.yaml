@@ -35,25 +35,25 @@ spec:
       command:
         - /kaniko/executor
       args:
-        - --dockerfile=${inputs.params.pathToDockerFile}
-        - --destination=${outputs.resources.docker-image.url}
-        - --context=${inputs.params.pathToContext}
+        - --dockerfile=$(inputs.params.pathToDockerFile)
+        - --destination=$(outputs.resources.docker-image.url)
+        - --context=$(inputs.params.pathToContext)
     - name: modify-yaml
       image: ubuntu
       command: ['/bin/bash']
-      args: ['-c', 'find /workspace/git-source -name ${YAMLFILE} -type f -exec sed -i -e s!"image: .*$"!"image: ${IMG}"!g {} \;']
+      args: ['-c', 'find /workspace/git-source -name $(YAMLFILE) -type f -exec sed -i -e s!"mage: .*$"!"mage: $(IMG)"!g {} \;']
       env:
         - name: IMG
-          value: ${outputs.resources.docker-image.url}
+          value: $(outputs.resources.docker-image.url)
         - name: YAMLFILE
-          value: ${inputs.params.appsody-deploy-file-name}
+          value: $(inputs.params.appsody-deploy-file-name)
     - name: install-manifest
       image: lachlanevenson/k8s-kubectl
       command: ['/bin/sh']
-      args: ['-c', 'find /workspace/git-source -name ${YAMLFILE} -type f|xargs kubectl apply -f']
+      args: ['-c', 'find /workspace/git-source -name $(YAMLFILE) -type f|xargs kubectl apply -f']
       env:
         - name: YAMLFILE
-          value: ${inputs.params.appsody-deploy-file-name}
+          value: $(inputs.params.appsody-deploy-file-name)
 #    - name: install-helm
 #      image: ibmcom/microclimate-k8s-helm:v2.9.1 
 #      command: ['helm']
