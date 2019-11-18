@@ -7,61 +7,25 @@ spec:
     resources:
       - name: git-source
         type: git
-    params:
-      - name: pathToDockerFile
-        default: /workspace/extracted/Dockerfile
-      - name: pathToContext
-        default: /workspace/extracted
-      - name: appsody-deploy-file-name
   outputs:
     resources:
       - name: docker-image
         type: image
   steps:
-    - name: assemble-extract-step
-      image: appsody/appsody-docker
-      command: ["/bin/bash"]
+    - name: build
+      securityContext:
+        privileged: true
+      image: appsody/appsody-buildah
+      command: ['/bin/bash']
       args:
         - -c
-        - "/setupAndRunExtract.sh"
+        - "cd /workspace/$gitsource && appsody build --buildah --buildah-options='--tls-verify=false' -t $(outputs.resources.docker-image.url)"
       env:
         - name: gitsource
           value: git-source
       volumeMounts:
-        - name: docker-socket
-          mountPath: /var/run/docker.sock
-    - name: build-push-step
-      image: gcr.io/kaniko-project/executor
-      command:
-        - /kaniko/executor
-      args:
-        - --dockerfile=$(inputs.params.pathToDockerFile)
-        - --destination=$(outputs.resources.docker-image.url)
-        - --context=$(inputs.params.pathToContext)
-    - name: modify-yaml
-      image: ubuntu
-      command: ['/bin/bash']
-      args: ['-c', 'find /workspace/git-source -name $(YAMLFILE) -type f -exec sed -i -e s!"mage: .*$"!"mage: $(IMG)"!g {} \;']
-      env:
-        - name: IMG
-          value: $(outputs.resources.docker-image.url)
-        - name: YAMLFILE
-          value: $(inputs.params.appsody-deploy-file-name)
-    - name: install-manifest
-      image: lachlanevenson/k8s-kubectl
-      command: ['/bin/sh']
-      args: ['-c', 'find /workspace/git-source -name $(YAMLFILE) -type f|xargs kubectl apply -f']
-      env:
-        - name: YAMLFILE
-          value: $(inputs.params.appsody-deploy-file-name)
-#    - name: install-helm
-#      image: ibmcom/microclimate-k8s-helm:v2.9.1 
-#      command: ['helm']
-#      args:
-#      - 'install'
-#      - '/workspace/extracted/config/chart'
+        - mountPath: /var/lib/containers
+          name: varlibcontainers
   volumes:
-    - name: docker-socket
-      hostPath:
-        path: /var/run/docker.sock
-        type: Socket
+    - name: varlibcontainers
+      emptyDir: {}
