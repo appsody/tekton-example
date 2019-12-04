@@ -7,7 +7,7 @@ items:
   spec:
     params:
     - name: url
-      value: index.docker.io/chilantim/my-appsody-image
+      value: index.docker.io/enriquelacal/testing
     type: image
 - apiVersion: tekton.dev/v1alpha1
   kind: PipelineResource
@@ -18,6 +18,6 @@ items:
     - name: revision
       value: master
     - name: url
-      value: https://github.com/chilanti/appsody-test-build
+      value: https://github.com/EnriqueL8/TestingStacks
     type: git
 kind: List
