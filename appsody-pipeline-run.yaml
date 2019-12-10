@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineRun
 metadata:
-  name: appsody-manual-pipeline-run-buildah
+  name: appsody-manual-pipeline-run
 spec:
   serviceAccount: appsody-sa
   timeout: "1h0m0s"  

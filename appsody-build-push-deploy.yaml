@@ -13,17 +13,28 @@ spec:
       - name: app-deploy-file-name
         default: app-deploy.yaml
   steps:
-    - name: build-push
+    - name: build
       securityContext:
         privileged: true
-      image: appsody/appsody-buildah:0.5.0-buildah1.9.0
+      image: appsody/appsody-buildah:0.5.2-buildah1.9.0
       command: ['/bin/bash']
       args:
         - -c
-        - "cd /workspace/$gitsource && appsody build -v --push --buildah --buildah-options='--tls-verify=false' -t $(inputs.resources.docker-image.url)"
+        - "cd /workspace/$gitsource && appsody build -v --buildah --buildah-options='--tls-verify=false' -t $(inputs.resources.docker-image.url)"
       env:
         - name: gitsource
           value: git-source
+      volumeMounts:
+        - mountPath: /var/lib/containers
+          name: varlibcontainers
+    - name: push
+      securityContext:
+        privileged: true
+      image: appsody/appsody-buildah:0.5.2-buildah1.9.0
+      command: ['/bin/bash']
+      args:
+        - -c
+        - "buildah push --tls-verify=false $(inputs.resources.docker-image.url) docker://$(inputs.resources.docker-image.url)"
       volumeMounts:
         - mountPath: /var/lib/containers
           name: varlibcontainers
