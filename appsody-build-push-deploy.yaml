@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: Task
 metadata:
-  name: appsody-build-task
+  name: appsody-build-push-deploy-task
 spec:
   inputs:
     resources:
@@ -16,7 +16,7 @@ spec:
     - name: build
       securityContext:
         privileged: true
-      image: appsody/appsody-buildah:0.5.2-buildah1.9.0
+      image: appsody/appsody-buildah:0.5.3-buildah1.9.0
       command: ['/bin/bash']
       args:
         - -c
@@ -30,7 +30,7 @@ spec:
     - name: push
       securityContext:
         privileged: true
-      image: appsody/appsody-buildah:0.5.2-buildah1.9.0
+      image: appsody/appsody-buildah:0.5.3-buildah1.9.0
       command: ['buildah', 'push', '--tls-verify=false', '$(inputs.resources.docker-image.url)', 'docker://$(inputs.resources.docker-image.url)']
       volumeMounts:
          - mountPath: /var/lib/containers
