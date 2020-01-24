@@ -16,9 +16,8 @@ spec:
         inputs:
         - name: git-source
           resource: git-source
-        outputs:
         - name: docker-image
           resource: docker-image
       params:
-      - name: appsody-deploy-file-name
+      - name: app-deploy-file-name
         value: app-deploy.yaml

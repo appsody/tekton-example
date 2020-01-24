@@ -1,0 +1,47 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: appsody-build-push-deploy-task
+spec:
+  inputs:
+    resources:
+      - name: git-source
+        type: git
+      - name: docker-image
+        type: image
+    params:
+      - name: app-deploy-file-name
+        default: app-deploy.yaml
+  steps:
+    - name: build
+      securityContext:
+        privileged: true
+      image: appsody/appsody-buildah:0.5.3-buildah1.9.0
+      command: ['/bin/bash']
+      args:
+        - -c
+        - "cd /workspace/$gitsource && appsody build -v --buildah --buildah-options='--format=docker' -t $(inputs.resources.docker-image.url) -f $(inputs.params.app-deploy-file-name)"
+      env:
+        - name: gitsource
+          value: git-source
+      volumeMounts:
+        - mountPath: /var/lib/containers
+          name: varlibcontainers
+    - name: push
+      securityContext:
+        privileged: true
+      image: appsody/appsody-buildah:0.5.3-buildah1.9.0
+      command: ['buildah', 'push', '--tls-verify=false', '$(inputs.resources.docker-image.url)', 'docker://$(inputs.resources.docker-image.url)']
+      volumeMounts:
+         - mountPath: /var/lib/containers
+           name: varlibcontainers
+    - name: deploy-image
+      image: kabanero/kabanero-utils
+      command: ['/bin/sh']
+      args: ['-c', 'cd /workspace/$gitsource && kubectl apply -f $(inputs.params.app-deploy-file-name)']
+      env:
+        - name: gitsource
+          value: git-source
+  volumes:
+    - name: varlibcontainers
+      emptyDir: {}
