@@ -75,19 +75,14 @@ This repo contains the manifests for the resources that you need to create on yo
   ```
   The Tekton pipeline is now fully set up.
 ### Openshift considerations
-If you are targeting **Openshift**, ensure you perform the following tasks.
+If you are targeting **Openshift**, ensure you perform the following task.
     
-  #### Allow Appsody to mount `docker.sock`
-  After you create the `appsody-sa` service account, run the following command:
-  ```
-  oc adm policy add-scc-to-user hostmount-anyuid -z appsody-sa
-  ```
-
   #### Create a persistent volume
   You need to create a persistent volume (PV), so that the pipeline can obtain a persistent volume claim when it runs. We have included an example of creating a PV in the `okd-pv.yaml` manifest. You can create it by running:
   ```
   kubectl apply -f okd-pv.yaml
   ```
+
 ## A few words on the required deployment manifest
 The pipeline is designed to deploy your application to the Kubernetes cluster using a deployment manifest. The build step generates a deployment manifest as part of the `appsody build` command and stores it in your project folder in the shared workspace. This deployment manifest named `app-deploy.yaml` is use to run `kubectl apply` to deploy your application.
 
