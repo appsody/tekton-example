@@ -40,7 +40,7 @@ This repo contains the manifests for the resources that you need to create on yo
 
 1) Now, create the pipeline task and the pipeline definition. We have a simple pipeline, with a single task that performs the various steps of building and deploying the project:
     ```
-    kubectl apply -f appsody-build-task.yaml
+    kubectl apply -f appsody-build-push-deploy.yaml
     kubectl apply -f appsody-build-pipeline.yaml
     ```
 
@@ -129,15 +129,17 @@ The file name can be modified by simply changing the relevant line in `appsody-b
       - name: appsody-deploy-file-name
         value: app-deploy.yaml
 ```
-Also, if you wanted to retrieve a deployment manifest from a different repository, rather than assuming its presence in the application code repository, you could modify this section of `appsody-build-task.yaml`:
+Also, if you wanted to retrieve a deployment manifest from a different repository, rather than assuming its presence in the application code repository, you could modify this section of `appsody-build-push-deploy.yaml`:
 ```
-    - name: install-knative
-      image: lachlanevenson/k8s-kubectl
+    - name: deploy-image
+      image: kabanero/kabanero-utils
       command: ['/bin/sh']
-      args: ['-c', 'find /workspace/extracted -name ${YAMLFILE} -type f|xargs kubectl apply -f']
+      args: ['-c', 'cd /workspace/$gitsource && kubectl apply -f $(YAMLFILE)']
       env:
+        - name: gitsource
+          value: git-source
         - name: YAMLFILE
-          value: ${inputs.params.appsody-deploy-file-name}
+          value: $(inputs.params.app-deploy-file-name)
 ```
 The implementation we have provided assumes the deployment manifest is in the `workspace/extracted` directory, which contains a clone of the source repository - but it could be adjusted to obtain that file from a different source. 
 

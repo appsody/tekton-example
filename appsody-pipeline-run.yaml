@@ -3,7 +3,6 @@ kind: PipelineRun
 metadata:
   name: appsody-manual-pipeline-run
 spec:
-  serviceAccount: appsody-sa
   serviceAccountName: appsody-sa
   timeout: "1h0m0s"  
   pipelineRef:
