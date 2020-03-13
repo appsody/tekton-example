@@ -11,7 +11,7 @@ spec:
   tasks:
     - name: appsody-build
       taskRef:
-        name: appsody-build-task
+        name: appsody-build-push-deploy-task
       resources:
         inputs:
         - name: git-source
