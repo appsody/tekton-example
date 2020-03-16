@@ -8,7 +8,7 @@ This repo contains an example of a Tekton pipeline that builds and deploys an ap
 In order to run this example, the following prerequisites are required:
 1) You have access to a Kubernetes cluster that has the [Tekton pipelines installed](https://github.com/tektoncd/pipeline/blob/master/docs/install.md).
 1) You have created an application using the appsody CLI, and your code is in a GitHub repository.
-1) Your Kubernetes cluster can access a Docker registry, such as Docker Hub (it can pull and push images). You must have a secret set up that contains valid credentials for authentication against your Docker registry.
+1) Your Kubernetes cluster can access a Docker registry, such as Docker Hub (it can pull and push images). You must have a [secret](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials) set up that contains valid credentials for authentication against your Docker registry.
 1) You will need to install the appsody operator in the namespace your application will be deployed to. [Appsody Operator Install](https://appsody.dev/docs/using-appsody/building-and-deploying/#using-the-appsody-operator-commands)
 
 This example and the artifacts that are included assume that you will be deploying the pipeline in the `default` namespace. If you wish to deploy it in your own namespace, you need to make the necessary changes (either append `-n <namespace>` to the `kubectl apply` commands, or edit the manifests to include a `namespace` definition).
