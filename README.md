@@ -8,7 +8,7 @@ This repo contains an example of a Tekton pipeline that builds and deploys an ap
 In order to run this example, the following prerequisites are required:
 1) You have access to a Kubernetes cluster that has the [Tekton pipelines installed](https://github.com/tektoncd/pipeline/blob/master/docs/install.md).
 1) You have created an application using the appsody CLI, and your code is in a GitHub repository.
-1) Your Kubernetes cluster can access a Docker registry, such as Docker Hub (it can pull and push images). You must have a secret set up that contains valid credentials for authentication against your Docker registry.
+1) Your Kubernetes cluster can access a Docker registry, such as Docker Hub (it can pull and push images). You must have a [secret](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials) set up that contains valid credentials for authentication against your Docker registry.
 1) You will need to install the appsody operator in the namespace your application will be deployed to. [Appsody Operator Install](https://appsody.dev/docs/using-appsody/building-and-deploying/#using-the-appsody-operator-commands)
 
 This example and the artifacts that are included assume that you will be deploying the pipeline in the `default` namespace. If you wish to deploy it in your own namespace, you need to make the necessary changes (either append `-n <namespace>` to the `kubectl apply` commands, or edit the manifests to include a `namespace` definition).
@@ -40,7 +40,7 @@ This repo contains the manifests for the resources that you need to create on yo
 
 1) Now, create the pipeline task and the pipeline definition. We have a simple pipeline, with a single task that performs the various steps of building and deploying the project:
     ```
-    kubectl apply -f appsody-build-task.yaml
+    kubectl apply -f appsody-build-push-deploy.yaml
     kubectl apply -f appsody-build-pipeline.yaml
     ```
 
@@ -129,15 +129,17 @@ The file name can be modified by simply changing the relevant line in `appsody-b
       - name: appsody-deploy-file-name
         value: app-deploy.yaml
 ```
-Also, if you wanted to retrieve a deployment manifest from a different repository, rather than assuming its presence in the application code repository, you could modify this section of `appsody-build-task.yaml`:
+Also, if you wanted to retrieve a deployment manifest from a different repository, rather than assuming its presence in the application code repository, you could modify this section of `appsody-build-push-deploy.yaml`:
 ```
-    - name: install-knative
-      image: lachlanevenson/k8s-kubectl
+    - name: deploy-image
+      image: kabanero/kabanero-utils
       command: ['/bin/sh']
-      args: ['-c', 'find /workspace/extracted -name ${YAMLFILE} -type f|xargs kubectl apply -f']
+      args: ['-c', 'cd /workspace/$gitsource && kubectl apply -f $(YAMLFILE)']
       env:
+        - name: gitsource
+          value: git-source
         - name: YAMLFILE
-          value: ${inputs.params.appsody-deploy-file-name}
+          value: $(inputs.params.app-deploy-file-name)
 ```
 The implementation we have provided assumes the deployment manifest is in the `workspace/extracted` directory, which contains a clone of the source repository - but it could be adjusted to obtain that file from a different source. 
 
